@@ -9,7 +9,7 @@ For questions, contact Jon Berry (jberry@sandia.gov) or Michael Wolf (mmwolf@san
 Please read the accompanying README and LICENSE files.
 
 ------------------------------------------------
-Description:
+Code:
 ------------------------------------------------
 
 This directory contains the actual software implementations for the miniTri miniapp.
@@ -17,7 +17,7 @@ We have developed several different implementations of miniTri using different
 fundamental methods.  The code is organized as follows:
 
 * __linearAlgebra__ -- contains linear algebra-based miniTri implementations
-* __utils__ -- contains helper functions used common to different implementations
+* __utils__ -- contains helper functions that are common to different implementations
 
 
 
