@@ -16,7 +16,8 @@ This directory contains the actual software implementations for the miniTri mini
 We have developed several different implementations of miniTri using different 
 fundamental methods.  The code is organized as follows:
 
-* __linearAlgebra__ -- contains linear algebra-based miniTri implementations
+* __linearAlgebra__ -- contains Graph BLAS like, linear algebra-based miniTri implementations
+* __linearAlgebraMethod2__ -- contains implementations of alternative linear algebra-based miniTri formulation
 * __utils__ -- contains helper functions that are common to different implementations
 
 
