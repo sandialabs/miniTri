@@ -35,3 +35,15 @@ in the graph. miniTri has the following basic steps (some of which can be combin
 
 From these k values,  an upper bound on the largest clique in the graph can be
 calculated. 
+
+#### Citing miniTri
+
+For citing miniTri or the linear algebra based formulation of miniTri use the following
+citation:
+
+> M.M. Wolf, J.W. Berry, and D.T. Stark, “A Task-Based Linear Algebra Building Blocks Approach for Scal- able Graph Analytics,” Proc. of 19th Annual IEEE High Performance Extreme Computing Conference, 2015.
+
+
+For citing the task-parallel linear algebra based miniTri work use the following citation:
+
+> M.M. Wolf, H.C. Edwards, and S.L. Olivier, “Kokkos/Qthreads Task-Parallel Approach to Linear Algebra Based Graph Analytics,” Proc. of 20th Annual IEEE High Performance Extreme Computing Conference, 2016.
