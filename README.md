@@ -41,7 +41,7 @@ calculated.
 For citing miniTri or the linear algebra based formulation of miniTri use the following
 citation:
 
-> M.M. Wolf, J.W. Berry, and D.T. Stark, “A Task-Based Linear Algebra Building Blocks Approach for Scal- able Graph Analytics,” Proc. of 19th Annual IEEE High Performance Extreme Computing Conference, 2015.
+> M.M. Wolf, J.W. Berry, and D.T. Stark, “A Task-Based Linear Algebra Building Blocks Approach for Scalable Graph Analytics,” Proc. of 19th Annual IEEE High Performance Extreme Computing Conference, 2015.
 
 
 For citing the task-parallel linear algebra based miniTri work use the following citation:
