@@ -1829,8 +1829,15 @@ void CSRMat::computeKCounts(const Vector &vTriDegrees,const Vector &eTriDegrees,
           ////////////////////////////////////////////////////////////////////
 	  // Find tvMin
 	  ////////////////////////////////////////////////////////////////////
-	  unsigned int tvMin = std::min(std::min(vTriDegrees[v1],vTriDegrees[v2]),
-					vTriDegrees[v3]);
+	  int vDegree1 = tvMap.find(v1)->second;
+	  int vDegree2 = tvMap.find(v2)->second;
+	  int vDegree3 = tvMap.find(v3)->second;
+
+	  // BUG FIX
+// 	  unsigned int tvMin = std::min(std::min(vTriDegrees[v1],vTriDegrees[v2]),
+// 					vTriDegrees[v3]);
+	  unsigned int tvMin = std::min(std::min(vDegree1,vDegree2),
+					vDegree3);
 	  ////////////////////////////////////////////////////////////////////
 
 
