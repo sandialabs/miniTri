@@ -8,7 +8,7 @@
 #              Makefile for code.                                            #
 #                                                                            #
 ##############################################################################
-UTILDIR = ../../../utils/
+UTILDIR = ../../utils/
 INCDIRS = -I. -I$(UTILDIR)
 CCC = mpicxx 
 CCFLAGS = -O3 -Wall -DNDEBUG
