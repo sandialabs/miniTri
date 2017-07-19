@@ -57,9 +57,12 @@
 #include <vector>
 #include <map>
 #include <cmath>
+#include <memory>
 
 #include "CSRMatrix.h"
 #include "Vector.h"
+
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Graph class
@@ -75,8 +78,8 @@ class Graph
   CSRMat mMatrix;
 
 
-  boost::shared_ptr<CSRMat> mTriMat;
-
+  std::shared_ptr<CSRMat> mTriMat;
+ 
   std::map<int,std::map<int,int> > mEdgeIndices;
 
 

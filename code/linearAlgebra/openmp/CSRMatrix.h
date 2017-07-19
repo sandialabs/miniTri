@@ -58,8 +58,8 @@ typedef enum {UNDEFINED,LOWERTRI,UPPERTRI,INCIDENCE} matrixtype;
 #include <list>
 #include <vector>
 #include <map>
+#include <vector>
 
-#include <boost/shared_array.hpp>
 
 class Vector;
 
@@ -75,10 +75,10 @@ class CSRMat
   int n;   //number of cols
   int nnz; //number of nonzeros
 
-  boost::shared_array<int> nnzInRow;                             // nnz in each row
-  boost::shared_array<boost::shared_array<int> > cols;           //columns of nonzeros
-  boost::shared_array<boost::shared_array<int> > vals; //values of nonzeros
-  boost::shared_array<boost::shared_array<int> > vals2; //values of nonzeros
+  std::vector<int> nnzInRow;                             // nnz in each row
+  std::vector<std::vector<int> > cols;           //columns of nonzeros
+  std::vector<std::vector<int> > vals; //values of nonzeros
+  std::vector<std::vector<int> > vals2; //values of nonzeros
 
   int mBlockSize;
 
@@ -106,12 +106,12 @@ class CSRMat
   //////////////////////////////////////////////////////////////////////////
   CSRMat(int _m, int _n, int blocksize=1,bool allocateVals2=false)
     :type(UNDEFINED),m(_m),n(_n),
-     nnzInRow(new int[m]),cols(new boost::shared_array<int> [m]),
-     vals(new boost::shared_array<int> [m]),mBlockSize(blocksize)
+     nnzInRow(m),cols(m),
+     vals(m),mBlockSize(blocksize)
   {
     if(allocateVals2==true)
     {
-      vals2 = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int> [m]);
+      vals2.resize(m);
     }
   };
   //////////////////////////////////////////////////////////////////////////
