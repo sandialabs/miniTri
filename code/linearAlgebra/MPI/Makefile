@@ -12,8 +12,7 @@
 UTILDIR = ../../utils/
 INCDIRS = -I. -I$(UTILDIR)
 CCC = mpicxx
-BOOSTCCFLAGS = -I/opt/boost-1.55/include
-CCFLAGS = -O3 -Wall -DNDEBUG -DUSE_MPI $(BOOSTCCFLAGS) 
+CCFLAGS = -O3 -Wall -DNDEBUG -DUSE_MPI 
 LIBPATH = -L. 
 
 #--------------------------------------------------

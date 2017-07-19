@@ -123,7 +123,7 @@ void Graph::triangleEnumerate()
     std::cout << "C = A*B: " << std::endl;
   }
 
-  boost::shared_ptr<CSRMat> C(new CSRMat(mMatrix.getGlobNumRows(),B.getGlobNumCols(),mComm,true));
+  std::shared_ptr<CSRMat> C(new CSRMat(mMatrix.getGlobNumRows(),B.getGlobNumCols(),mComm,true));
 
   MPI_Barrier(mComm);
   gettimeofday(&t1, NULL);

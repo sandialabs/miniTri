@@ -59,7 +59,6 @@ typedef enum {UNDEFINED,LOWERTRI,UPPERTRI} matrixtype;
 #include <vector>
 #include <map>
 
-#include <boost/shared_array.hpp>
 #include <mpi.h>
 
 #include "mmUtil.h"

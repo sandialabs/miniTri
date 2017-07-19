@@ -57,8 +57,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
-
-#include <boost/shared_array.hpp>
+#include <memory>
 
 #include "CSRmatrix.hpp"
 #include "Vector.hpp"
@@ -77,7 +76,7 @@ class Graph
   CSRMat mMatrix;
 
   int mNumTriangles;
-  boost::shared_ptr<CSRMat> mTriMat;
+  std::shared_ptr<CSRMat> mTriMat;
 
   std::map<int,std::map<int,int> > mEdgeIndices;
 
