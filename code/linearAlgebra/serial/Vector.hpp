@@ -53,7 +53,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <boost/shared_array.hpp>
+#include <vector>
 
 //////////////////////////////////////////////////////////////////////////////
 // Compressed Sparse Row storage format Matrix
@@ -62,9 +62,8 @@ class Vector
 {
 
  private:
-  int mNumElements;   //number of elements
 
-  boost::shared_array<int> mElements;                             // elements in vector
+  std::vector<int> mElements;                             // elements in vector
 
  public:
 
@@ -72,7 +71,7 @@ class Vector
   // default constructor -- builds empty matrix
   //////////////////////////////////////////////////////////////////////////
   Vector() 
-    :mNumElements(0),mElements()
+    :mElements(0)
   {
   };
   //////////////////////////////////////////////////////////////////////////
@@ -81,19 +80,19 @@ class Vector
   // constructor -- allocates memory for CSR sparse matrix
   //////////////////////////////////////////////////////////////////////////
   Vector(int _m, int _bs=1)
-    :mNumElements(_m), mElements(new int[_m]())
+    :mElements(_m)
   {
   };
   //////////////////////////////////////////////////////////////////////////
 
-  //////////////////////////////////////////////////////////////////////////
-  // Copy constructor -- No data reallocation, just copying of smart pointers
-  //////////////////////////////////////////////////////////////////////////
-  Vector(const Vector &obj)
-    :mNumElements(obj.mNumElements),mElements(obj.mElements)
-  {
-  };
-  //////////////////////////////////////////////////////////////////////////
+//   //////////////////////////////////////////////////////////////////////////
+//   // Copy constructor -- No data reallocation, just copying of smart pointers
+//   //////////////////////////////////////////////////////////////////////////
+//   Vector(const Vector &obj)
+//     :mElements(obj.mElements)
+//   {
+//   };
+//   //////////////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////////////
   // destructor -- deletes matrix
@@ -108,7 +107,7 @@ class Vector
   //////////////////////////////////////////////////////////////////
 
   // returns the number of rows
-  int getSize() const { return mNumElements;};
+  int getSize() const { return mElements.size();};
 
 
   //////////////////////////////////////////////////////////////////////////
@@ -124,8 +123,7 @@ class Vector
   //////////////////////////////////////////////////////////////////////////
   void resize(int _m)
   {
-    mNumElements = _m;
-    mElements = boost::shared_array<int>(new int[_m]());
+    mElements.resize(_m);
   }
   //////////////////////////////////////////////////////////////////////////
 
@@ -143,7 +141,7 @@ class Vector
   //////////////////////////////////////////////////////////////////////////
   void setScalar(int alpha) 
   {
-    for(int i=0;i<mNumElements;i++)
+    for(unsigned int i=0;i<mElements.size();i++)
     {
       mElements[i]=alpha;
     }
@@ -156,7 +154,7 @@ class Vector
   void Print() const
   {
     std::cout << "Vector: " << std::endl;
-    for(int i=0; i<mNumElements; i++)
+    for(unsigned int i=0; i<mElements.size(); i++)
     {
       std::cout << mElements[i] << std::endl;
     }

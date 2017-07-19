@@ -67,9 +67,6 @@
 
 int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd);
 
-void createPermutation(boost::shared_array<int> degree, std::vector<int> &perm, std::vector<int> &iperm);
-void formDegreeMultiMap(boost::shared_array<int> degree, int size, std::multimap<int,int> &degreeMap);
-
 unsigned int choose2(unsigned int k);
 
 
@@ -88,7 +85,7 @@ void CSRMat::print() const
 	  std::cout << rownum << " " << cols[rownum][nzIdx] << " { ";
 
 	  std::cout << vals[rownum][nzIdx] << std::endl;
-	  if(vals2 == boost::shared_array<boost::shared_array<int> >())
+	  if(vals2.size()!=0)
 	    {
 	      std::cout << ", " << vals2[rownum][nzIdx];
 	    }
@@ -173,10 +170,10 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
 
   if(oldM!=m)
   {
-    nnzInRow = boost::shared_array<int>(new int[m]);
-    cols = boost::shared_array<boost::shared_array<int> > (new boost::shared_array<int>[m]);
-    vals = boost::shared_array<boost::shared_array<int> > (new boost::shared_array<int>[m]);
-    vals2 = boost::shared_array<boost::shared_array<int> > (new boost::shared_array<int>[m]);
+    nnzInRow.resize(m);
+    cols.resize(m);
+    vals.resize(m);
+    vals2.resize(m);
   }
   //////////////////////////////////////////////////////////
 
@@ -237,9 +234,9 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
       /////////////////////////////////////////
       //Allocate memory for this row
       /////////////////////////////////////////
-      cols[rownum]  = boost::shared_array<int>(new int[nnzInRow[rownum]]);
-      vals[rownum]  = boost::shared_array<int>(new int[nnzInRow[rownum]]);
-      vals2[rownum] = boost::shared_array<int>(new int[nnzInRow[rownum]]);
+      cols[rownum].resize(nnzInRow[rownum]);
+      vals[rownum].resize(nnzInRow[rownum]);
+      vals2[rownum].resize(nnzInRow[rownum]);
 
       /////////////////////////////////////////
       //Copy new data into row
@@ -333,9 +330,9 @@ void CSRMat::readMMMatrix(const char *fname)
   //////////////////////////////////////////////////////////////
   // Allocate memory for matrix
   //////////////////////////////////////////////////////////////
-  nnzInRow = boost::shared_array<int>(new int[m]);
-  cols = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
-  vals = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
+  nnzInRow.resize(m);
+  cols.resize(m);
+  vals.resize(m);
   //////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////
@@ -351,8 +348,8 @@ void CSRMat::readMMMatrix(const char *fname)
     nnzInRow[rownum] = nnzToAdd;
     nnz += nnzToAdd;
 
-    cols[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
-    vals[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
+    cols[rownum].resize(nnzToAdd);
+    vals[rownum].resize(nnzToAdd);
 
     for (iter=rowSets[rownum].begin();iter!=rowSets[rownum].end();iter++)
     {
@@ -430,9 +427,9 @@ void CSRMat::readBinMatrix(const char *fname)
   //////////////////////////////////////////////////////////////
   // Allocate memory for matrix
   //////////////////////////////////////////////////////////////
-  nnzInRow = boost::shared_array<int>(new int[m]);
-  cols = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
-  vals = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
+  nnzInRow.resize(m);
+  cols.resize(m);
+  vals.resize(m);
   //////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////
@@ -448,8 +445,8 @@ void CSRMat::readBinMatrix(const char *fname)
     nnzInRow[rownum] = nnzToAdd;
     nnz += nnzToAdd;
 
-    cols[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
-    vals[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
+    cols[rownum].resize(nnzToAdd);
+    vals[rownum].resize(nnzToAdd);
 
     for (iter=rowSets[rownum].begin();iter!=rowSets[rownum].end();iter++)
     {
@@ -479,9 +476,9 @@ void CSRMat::createTriMatrix(const CSRMat &matSrc, matrixtype mtype)
   //////////////////////////////////////////////////////////////
   // Allocate memory for matrix -- assumes arrays not allocated
   //////////////////////////////////////////////////////////////
-  nnzInRow = boost::shared_array<int>(new int[m]);
-  cols = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
-  vals = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
+  nnzInRow.resize(m);
+  cols.resize(m);
+  vals.resize(m);
   //////////////////////////////////////////////////////////////
 
   for(int rownum=0; rownum<m; rownum++)
@@ -512,8 +509,8 @@ void CSRMat::createTriMatrix(const CSRMat &matSrc, matrixtype mtype)
     nnzInRow[rownum] = nnzToAdd;
     nnz += nnzToAdd;
 
-    cols[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
-    vals[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
+    cols[rownum].resize(nnzToAdd);
+    vals[rownum].resize(nnzToAdd);
 
     std::map<int,int>::const_iterator iter;
 
@@ -542,9 +539,9 @@ void CSRMat::createIncidentMatrix(const CSRMat &matSrc, std::map<int,std::map<in
   //////////////////////////////////////////////////////////////
   // Allocate memory for matrix -- assumes arrays not allocated
   //////////////////////////////////////////////////////////////
-  nnzInRow = boost::shared_array<int>(new int[m]);
-  cols = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
-  vals = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int>[m]);
+  nnzInRow.resize(m);
+  cols.resize(m);
+  vals.resize(m);
   //////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////
@@ -586,8 +583,8 @@ void CSRMat::createIncidentMatrix(const CSRMat &matSrc, std::map<int,std::map<in
     nnzInRow[rownum] = nnzToAdd;
     nnz += nnzToAdd;
 
-    cols[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
-    vals[rownum] = boost::shared_array<int>(new int[nnzToAdd]);
+    cols[rownum].resize(nnzToAdd);
+    vals[rownum].resize(nnzToAdd);
 
     std::set<int>::const_iterator iter;
 
@@ -603,93 +600,6 @@ void CSRMat::createIncidentMatrix(const CSRMat &matSrc, std::map<int,std::map<in
 
 }
 ////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-//
-// perhaps could improve algorithm by not requiring copy of data
-////////////////////////////////////////////////////////////////////////////////
-void CSRMat::permute()
-{
-  std::vector<int> perm(m);
-  std::vector<int> iperm(m);
-
-  createPermutation(nnzInRow, perm, iperm);
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Set temp pointers to save original order
-  ///////////////////////////////////////////////////////////////////////////
-  std::vector<int> tmpNNZ(m);
-  std::vector<boost::shared_array<int> > tmpCols(m);
-  std::vector<boost::shared_array<int> > tmpVals(m);
-
-  for(int rownum=0; rownum<m; rownum++)
-  {
-    tmpNNZ[rownum] = nnzInRow[rownum];
-    tmpCols[rownum] = cols[rownum];
-    tmpVals[rownum] = vals[rownum];
-  }
-  ///////////////////////////////////////////////////////////////////////////
-
-  ///////////////////////////////////////////////////////////////////////////
-  //Permute matrix, row by row
-  ///////////////////////////////////////////////////////////////////////////
-  for(int rownum=0; rownum<m; rownum++)
-  {
-    //////////////////////////////////////////////////////////////////////
-    // Copy data into permuted order
-    //////////////////////////////////////////////////////////////////////
-    nnzInRow[rownum] = tmpNNZ[iperm[rownum]];    
-    cols[rownum] = tmpCols[iperm[rownum]];
-    
-    /////////////////////////////////////////////////////////////////
-    // permute column numbers as well -- perhaps should sort this
-    /////////////////////////////////////////////////////////////////
-    for(int i=0;i<nnzInRow[rownum];i++)
-    {
-      cols[rownum][i] = perm[cols[rownum][i]];
-    }
-    /////////////////////////////////////////////////////////////////
-
-    vals[rownum] = tmpVals[iperm[rownum]];
-
-    //////////////////////////////////////////////////////////////////////
-
-  }
-  ///////////////////////////////////////////////////////////////////////////
-
-}
-////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-void createPermutation(boost::shared_array<int> degree, std::vector<int> &perm, std::vector<int> &iperm)
-{
-   std::multimap<int,int> degreeMMap;
-   formDegreeMultiMap(degree,perm.size(),degreeMMap);
-
-   std::multimap<int,int>::const_iterator iter;
-   int cnt=0;
-   for(iter=degreeMMap.begin(); iter!=degreeMMap.end(); ++iter)
-   {
-       perm[(*iter).second] = cnt;
-       iperm[cnt] = (*iter).second;
-       cnt++;
-   }
-}
-////////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-// Form sorted multimap of (degree,rownum) pairs, currently sorted in increasing order
-//////////////////////////////////////////////////////////////////////////////
-void formDegreeMultiMap(boost::shared_array<int> degree, int size, std::multimap<int,int> &degreeMMap)
-{
-  for(int i=0; i<size; i++)
-  {
-    degreeMMap.insert(std::pair<int, int>(degree[i], i));
-  }
-}
-//////////////////////////////////////////////////////////////////////////////
-
 
 //////////////////////////////////////////////////////////////////////////////
 // addNZ -- For a given row, add a column for a nonzero into a sorted list

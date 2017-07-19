@@ -126,7 +126,7 @@ void Graph::triangleEnumerate()
   ///////////////////////////////////////////////////////////////////////
   std::cout << "--------------------" << std::endl;
 
-  boost::shared_ptr<CSRMat> C(new CSRMat(mMatrix.getM(),B.getN(),true));
+  std::shared_ptr<CSRMat> C(new CSRMat(mMatrix.getM(),B.getN(),true));
 
   std::cout << "C = A*B: " << std::endl;
 

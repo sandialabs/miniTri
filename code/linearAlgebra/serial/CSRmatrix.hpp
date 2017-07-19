@@ -59,8 +59,6 @@ typedef enum {UNDEFINED,LOWERTRI,UPPERTRI,INCIDENCE} matrixtype;
 #include <vector>
 #include <map>
 
-#include <boost/shared_array.hpp>
-
 class Vector;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -75,17 +73,17 @@ class CSRMat
   int n;   //number of cols
   int nnz; //number of nonzeros
 
-  boost::shared_array<int> nnzInRow;                             // nnz in each row
-  boost::shared_array<boost::shared_array<int> > cols;           //columns of nonzeros
-  boost::shared_array<boost::shared_array<int> > vals; //values of nonzeros
-  boost::shared_array<boost::shared_array<int> > vals2; //values of nonzeros
+  std::vector<int> nnzInRow;                             // nnz in each row
+  std::vector<std::vector<int> > cols;           //columns of nonzeros
+  std::vector<std::vector<int> > vals; //values of nonzeros
+  std::vector<std::vector<int> > vals2; //values of nonzeros
 
  public:
   //////////////////////////////////////////////////////////////////////////
   // default constructor -- builds empty matrix
   //////////////////////////////////////////////////////////////////////////
   CSRMat() 
-    :type(UNDEFINED),m(0),n(0),nnz(0),nnzInRow(),cols(),vals(),vals2()
+    :type(UNDEFINED),m(0),n(0),nnz(0),nnzInRow(0),cols(0),vals(0),vals2(0)
   {
   };
   //////////////////////////////////////////////////////////////////////////
@@ -94,7 +92,7 @@ class CSRMat
   // Constructor that accepts matrix type as an argument
   //////////////////////////////////////////////////////////////////////////
   CSRMat(matrixtype _type) 
-    :type(_type),m(0),n(0),nnz(0),nnzInRow(),cols(),vals(),vals2()
+    :type(_type),m(0),n(0),nnz(0),nnzInRow(0),cols(0),vals(0),vals2(0)
   {
   };
   //////////////////////////////////////////////////////////////////////////
@@ -104,12 +102,12 @@ class CSRMat
   //////////////////////////////////////////////////////////////////////////
   CSRMat(int _m, int _n,bool allocateVals2=false)
     :type(UNDEFINED),m(_m),n(_n),
-     nnzInRow(new int[m]),cols(new boost::shared_array<int> [m]),
-     vals(new boost::shared_array<int> [m])
+     nnzInRow(m),cols(m),
+     vals(m)
   {
     if(allocateVals2==true)
     {
-      vals2 = boost::shared_array<boost::shared_array<int> >(new boost::shared_array<int> [m]);
+      vals2.resize(m);
     }
   };
   //////////////////////////////////////////////////////////////////////////
@@ -159,7 +157,7 @@ class CSRMat
 
 
   // returns value for nonzero at inddex nzindx
-  inline int & getVal(int rowi, int nzindx) const 
+  inline int getVal(int rowi, int nzindx) const 
     {return vals[rowi][nzindx];};
 
   //////////////////////////////////////////////////////////////////
