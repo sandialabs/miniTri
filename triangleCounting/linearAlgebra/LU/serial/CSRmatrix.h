@@ -55,7 +55,6 @@
 
 typedef enum {UNDEFINED,LOWERTRI,UPPERTRI} matrixtype;
 
-#include <list>
 #include <vector>
 #include <map>
 
@@ -76,7 +75,7 @@ class CSRMat
 
   int *nnzInRow;         // number of nonzeros in each row
   int **cols;            //columns of nonzeros
-  std::list<int> **vals; //values of nonzeros
+  int **vals; //values of nonzeros
 
  public:
   //////////////////////////////////////////////////////////////////////////
@@ -105,7 +104,7 @@ class CSRMat
   {
     nnzInRow = new int[m];
     cols = new int* [m];
-    vals = new std::list<int> *[m];
+    vals = new int* [m];
 
     for(int i=0;i<m;i++)
     {
@@ -164,7 +163,7 @@ class CSRMat
   //////////////////////////////////////////////////////////////////
   // Sums matrix elements
   //////////////////////////////////////////////////////////////////
-  std::list<int> getSumElements() const;
+  int getSumElements() const;
   //////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////
@@ -187,7 +186,7 @@ class CSRMat
 
 
   // returns value for nonzero at inddex nzindx
-  inline const std::list<int> & getVal(int rowi, int nzindx) const 
+  inline int getVal(int rowi, int nzindx) const 
     {return vals[rowi][nzindx];};
 
   //////////////////////////////////////////////////////////////////
@@ -202,8 +201,6 @@ class CSRMat
   void readMMMatrix(const char* fname);
 
   void createTriMatrix(const CSRMat &matrix, matrixtype mtype);
-
-  void permute();
 
   //////////////////////////////////////////////////////////////////////////
 

@@ -51,7 +51,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <list>
 #include <map>
 #include <set>
 #include <cassert>
@@ -59,7 +58,6 @@
 #include <sys/time.h>
 
 #include "Graph.h"
-//#include "util.h"
 #include "mmio.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -149,11 +147,8 @@ void Graph::countTriangles()
   std::cout << "--------------------" << std::endl;
 
   gettimeofday(&t1, NULL);
-  mTriangles = B.getSumElements();
+  mNumTriangles = B.getSumElements();
   gettimeofday(&t2, NULL);
-
-  assert(mTriangles.size() % 3 == 0);
-  mNumTriangles = mTriangles.size() / 3;
 
   eTime = t2.tv_sec - t1.tv_sec + ((t2.tv_usec-t1.tv_usec)/1000000.0);
   std::cout << "TIME - Time to sum up triangles: " << eTime << std::endl;

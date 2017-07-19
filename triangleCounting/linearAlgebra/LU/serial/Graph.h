@@ -53,7 +53,6 @@
 #ifndef GRAPH_H
 #define GRAPH_H
 
-#include <list>
 #include <vector>
 #include <map>
 #include <cmath>
@@ -75,14 +74,13 @@ class Graph
   CSRMat mMatrix;
 
   int mNumTriangles;
-  std::list<int> mTriangles; //contains triangles in graph
 
  public:
   //////////////////////////////////////////////////////////////////////////
   // default constructor -- builds empty graph
   //////////////////////////////////////////////////////////////////////////
   Graph() 
-    :mFilename("UNDEFINED"),mVertProp(0),mNumVerts(0),mMatrix(), mNumTriangles(0), mTriangles(0)
+    :mFilename("UNDEFINED"),mVertProp(0),mNumVerts(0),mMatrix(), mNumTriangles(0)
   {
   };
   //////////////////////////////////////////////////////////////////////////
@@ -91,7 +89,7 @@ class Graph
   // Constructor that accepts matrix type as an argument
   //////////////////////////////////////////////////////////////////////////
   Graph(std::string _fname) 
-    :mFilename(_fname), mVertProp(0),mMatrix(), mNumTriangles(0), mTriangles(0)
+    :mFilename(_fname), mVertProp(0),mMatrix(), mNumTriangles(0)
   {
      mMatrix.readMMMatrix(mFilename.c_str());
      mNumVerts = mMatrix.getM();
@@ -112,8 +110,6 @@ class Graph
   //////////////////////////////////////////////////////////////////////////
   void countTriangles();
   //////////////////////////////////////////////////////////////////////////
-
-  void printTriangles() const;
 
   int getNumTriangles() const {return mNumTriangles;};
 
