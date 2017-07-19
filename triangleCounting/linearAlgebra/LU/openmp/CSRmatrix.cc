@@ -54,7 +54,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <list>
 #include <map>
 #include <set>
 #include <cassert>
@@ -67,7 +66,7 @@
 
 #define CHUNK 1
 
-int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd);
+int addNZ(std::map<int,int> &nzMap, int col, int elemToAdd);
 
 //////////////////////////////////////////////////////////////////////////////
 // print function -- outputs matrix to file
@@ -75,21 +74,13 @@ int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd);
 //////////////////////////////////////////////////////////////////////////////
 void CSRMat::print() const
 {
-  std::list<int>::const_iterator it;
-
   std::cout << "Matrix: " << m << " " << n << " " << nnz << std::endl;
 
   for(int rownum=0; rownum<m; rownum++)
   {
     for(int nzIdx=0; nzIdx<nnzInRow[rownum]; nzIdx++)
     {
-      std::cout << rownum << " " << cols[rownum][nzIdx] << " { ";
-
-      for (it = vals[rownum][nzIdx].begin(); it != vals[rownum][nzIdx].end(); ++it) 
-      {
-	std::cout << *it << " ";
-      }
-      std::cout << "}" << std::endl;
+      std::cout << rownum << " " << cols[rownum][nzIdx] << vals[rownum][nzIdx] << std::endl;
     }
   }
 }
@@ -98,25 +89,21 @@ void CSRMat::print() const
 ////////////////////////////////////////////////////////////////////////////////
 // Sums matrix elements
 ////////////////////////////////////////////////////////////////////////////////
-std::list<int> CSRMat::getSumElements() const
+int CSRMat::getSumElements() const
 {
-  std::list<int> matList;
-  std::list<int>::const_iterator it;
+
+  int sum = 0;
 
   for(int rownum=0; rownum<m; rownum++)
   {
     int nrows = nnzInRow[rownum];
     for(int nzIdx=0; nzIdx<nrows; nzIdx++)
     {
-
-      for (it = vals[rownum][nzIdx].begin(); it != vals[rownum][nzIdx].end(); ++it) 
-      {
-        matList.push_back(*it);
-      }
+      sum += vals[rownum][nzIdx];
     }
   }
 
-  return matList;
+  return sum;
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -166,7 +153,7 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
   
     nnzInRow = new int[m];
     cols = new int*[m];
-    vals = new std::list<int>*[m];
+    vals = new int*[m];
     
 
 #pragma omp parallel for schedule(static,CHUNK) 
@@ -190,7 +177,7 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
   for (int rownum=0; rownum<m; rownum++)
   {
     nnzInRow[rownum]=0;
-    std::map<int,std::list<int> > newNZs;
+    std::map<int,int> newNZs;
 
     int nnzInRowA = A.getNNZInRow(rownum);
 
@@ -204,7 +191,9 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
       {
         int colB=B.getCol(colA, nzindxB);
 
-        nnzInRow[rownum] += addNZ(newNZs,colB, colA);
+        // Should probably have a multiply to be here to be fair
+        // but this will always be 1.0
+        nnzInRow[rownum] += addNZ(newNZs, colB, 1);
       }
     }
 
@@ -216,26 +205,20 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
       /////////////////////////////////////////
 
       cols[rownum] = new int[nnzInRow[rownum]];
-      vals[rownum] = new std::list<int>[nnzInRow[rownum]];
+      vals[rownum] = new int[nnzInRow[rownum]]();
 
       /////////////////////////////////////////
       //Copy new data into row
       /////////////////////////////////////////
-      std::map<int,std::list<int> >::iterator iter;
+      std::map<int,int>::iterator iter;
       int nzcnt=0;
 
-      // Iterate through list
+      // Iterate through nonzeros
       for (iter=newNZs.begin(); iter!=newNZs.end(); iter++)
       {
-        cols[rownum][nzcnt]= (*iter).first;
+        cols[rownum][nzcnt]=(*iter).first;
+        vals[rownum][nzcnt]=(*iter).second;
 
-        const std::list<int> & lstRef = (*iter).second;
-
-	std::list<int>::const_iterator lIter;
-	for (lIter=lstRef.begin(); lIter!=lstRef.end(); lIter++)
-	{
-          vals[rownum][nzcnt].push_back(*lIter);
-	}
         nzcnt++;
       }
       /////////////////////////////////////////
@@ -278,7 +261,7 @@ void CSRMat::EWMult(const CSRMat &W)
   // Loop over each row
   for(int rownum=0;rownum<m;rownum++)
   {
-    std::map<int,std::list<int> > newNZs;
+    std::map<int,int> newNZs;
     std::set<int> colsWrow;
 
     ////////////////////////////////////////////////
@@ -311,24 +294,8 @@ void CSRMat::EWMult(const CSRMat &W)
       //////////////////////////////////////      
       if(it != colsWrow.end())
       {
-	std::list<int> newval;
-
-        const std::list<int> &lstRef = vals[rownum][nzIndx];        
-        std::list<int>::const_iterator lstIter;
-
-        // Iterate through list
-        // For each element, insert triangles (row,element,col)
-        for (lstIter=lstRef.begin(); lstIter!=lstRef.end(); lstIter++)
-        {
-          newval.push_back(rownum);
-          newval.push_back(*lstIter);
-          newval.push_back(colIndx);
-        }
-
-        //MMW: does this copy properly
-        newNZs.insert(std::pair<int,std::list<int> >(colIndx,newval));
+        newNZs.insert(std::pair<int,int>(colIndx,vals[rownum][nzIndx]));
       }
-
     }
     ////////////////////////////////////////////////
 
@@ -355,7 +322,7 @@ void CSRMat::EWMult(const CSRMat &W)
       {
         delete [] vals[rownum];
       }
-      vals[rownum] = new std::list<int>[nnzInRow[rownum]];
+      vals[rownum] = new int[nnzInRow[rownum]];
     }
     ////////////////////////////////////////////////
 
@@ -364,27 +331,14 @@ void CSRMat::EWMult(const CSRMat &W)
     ////////////////////////////////////////////////
     int nzIndx=0;
 
-    std::map<int,std::list<int> >::const_iterator mapIt;
-    std::list<int>::const_iterator lstIter;
+    std::map<int,int>::const_iterator mapIt;
 
     for(mapIt=newNZs.begin();mapIt!=newNZs.end();++mapIt)
     {
       cols[rownum][nzIndx] = (*mapIt).first;
-
-      // clear value list
-      vals[rownum][nzIndx].clear();
-
-      const std::list<int> &lstRef = (*mapIt).second;
-
-      // Iterate through list
-      // For each element, insert triangles (row,element,col)
-      for (lstIter=lstRef.begin(); lstIter!=lstRef.end(); lstIter++)
-      {
-        vals[rownum][nzIndx].push_back(*lstIter);
-      }
+      vals[rownum][nzIndx] = (*mapIt).second;
 
       nzIndx++;
-
     }
     //////////////////////////////////////////////////
   }
@@ -457,7 +411,7 @@ void CSRMat::readMMMatrix(const char *fname)
   //////////////////////////////////////////////////////////////
   nnzInRow = new int[m];
   cols = new int*[m];
-  vals = new std::list<int>*[m];
+  vals = new int*[m];
   //////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////
@@ -474,12 +428,12 @@ void CSRMat::readMMMatrix(const char *fname)
     nnz += nnzToAdd;
 
     cols[rownum] = new int[nnzToAdd];
-    vals[rownum] = new std::list<int> [nnzToAdd];
+    vals[rownum] = new int[nnzToAdd];
 
     for (iter=rowSets[rownum].begin();iter!=rowSets[rownum].end();iter++)
     {
       cols[rownum][nnzIndx] = (*iter).first;
-      vals[rownum][nnzIndx].push_back( (*iter).second);
+      vals[rownum][nnzIndx] = (*iter).second;
       nnzIndx++;
     }
   }
@@ -506,7 +460,7 @@ void CSRMat::createTriMatrix(const CSRMat &matSrc, matrixtype mtype)
   //////////////////////////////////////////////////////////////
   nnzInRow = new int[m];
   cols = new int*[m];
-  vals = new std::list<int>*[m];
+  vals = new int*[m];
   //////////////////////////////////////////////////////////////
 
   for(int rownum=0; rownum<m; rownum++)
@@ -518,16 +472,16 @@ void CSRMat::createTriMatrix(const CSRMat &matSrc, matrixtype mtype)
     for(int nzindxSrc=0; nzindxSrc<nnzInRowSrc; nzindxSrc++)
     {
       int colSrc=matSrc.getCol(rownum, nzindxSrc);
-      const std::list<int> & valSrc = matSrc.getVal(rownum, nzindxSrc);
+      int valSrc = matSrc.getVal(rownum, nzindxSrc);
          
       // WARNING: assumes there is only 1 element in value for now
       if(type==LOWERTRI && rownum>colSrc)
       {
-        nzMap[colSrc]=valSrc.front();
+        nzMap[colSrc]=valSrc;
       }
       else if(type==UPPERTRI && rownum<colSrc)
       {
-        nzMap[colSrc]=valSrc.front();
+        nzMap[colSrc]=valSrc;
       }
 
     }
@@ -538,14 +492,14 @@ void CSRMat::createTriMatrix(const CSRMat &matSrc, matrixtype mtype)
     nnz += nnzToAdd;
 
     cols[rownum] = new int[nnzToAdd];
-    vals[rownum] = new std::list<int> [nnzToAdd];
+    vals[rownum] = new int[nnzToAdd];
 
     std::map<int,int>::const_iterator iter;
 
     for (iter=nzMap.begin();iter!=nzMap.end();iter++)
     {
       cols[rownum][nnzIndx] = (*iter).first;
-      vals[rownum][nnzIndx].push_back( (*iter).second);
+      vals[rownum][nnzIndx] = (*iter).second;
       nnzIndx++;
     }
 
@@ -557,9 +511,9 @@ void CSRMat::createTriMatrix(const CSRMat &matSrc, matrixtype mtype)
 //////////////////////////////////////////////////////////////////////////////
 // addNZ -- For a given row, add a column for a nonzero into a sorted list
 //////////////////////////////////////////////////////////////////////////////
-int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd)
+int addNZ(std::map<int,int> &nzMap,int col, int elemToAdd)
 {
-  std::map<int,std::list<int> >::iterator it;
+  std::map<int,int>::iterator it;
 
   it = nzMap.find(col);
 
@@ -568,13 +522,11 @@ int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd)
   //////////////////////////////////////      
   if(it != nzMap.end())
   {
-    (*it).second.push_back(elemToAdd);
+    (*it).second += elemToAdd;
     return 0;
   }
 
-  std::list<int> newList;
-  newList.push_back(elemToAdd);
-  nzMap.insert(std::pair<int,std::list<int> >(col, newList));
+  nzMap.insert(std::pair<int,int>(col, elemToAdd));
   return 1;
 }
 //////////////////////////////////////////////////////////////////////////////
