@@ -15,8 +15,8 @@ triangleCounting/linearAlgebra/LH:
 This directory contains different implementations of a linear algebra based formulation of
 triangle counting:
 
-  1. C = (A * H), where A is the adjacency matrix of the graph and H is the incidence matrix of the graph
-  2. Number of triangles = the number of entries in C such that C(i,j)=2 divided by 3
+  1. C = (L * H), where L is lower triangular part of the adjacency matrix of the graph and H is the incidence matrix of the graph
+  2. Number of triangles = the number of entries in C such that C(i,j)=2 
 
 A detailed description of this formulation can be found in the following paper:
 
