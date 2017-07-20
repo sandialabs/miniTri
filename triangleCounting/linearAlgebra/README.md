@@ -16,9 +16,9 @@ This directory contains triangle counting software that has been developed as a 
 of the miniTri miniapp development.  In particular, this directory includes several different
 linear algebra-based methods.  The code is organized as follows:
 
-* __LH__ -- Number of triangles = sum((A &ast H)==2)
-* __LL__ -- Number of triangles = sum((L*L) .&ast L)
-* __LU__ -- Number of triangles = sum((L*U) .* L)
+* __LH__ -- Number of triangles = sum((A ** H)==2)
+* __LL__ -- Number of triangles = sum((L*L) .** L)
+* __LU__ -- Number of triangles = sum((L*U) .** L)
 
 
 
