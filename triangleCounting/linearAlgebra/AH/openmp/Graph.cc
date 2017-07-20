@@ -108,7 +108,7 @@ void Graph::countTriangles()
   std::cout << "--------------------" << std::endl;
 
 
-  std::shared_ptr<CSRMat> C(new CSRMat(mMatrix.getM(),B.getN(),mBlockSize,true));
+  std::shared_ptr<CSRMat> C(new CSRMat(mMatrix.getM(),B.getN(),mBlockSize));
 
   std::cout << "C = L*B: " << std::endl;
 
@@ -123,7 +123,7 @@ void Graph::countTriangles()
 
   std::cout << "--------------------" << std::endl;
 
-  std::cout << "NNZ: " << B.getNNZ() << std::endl;
+  std::cout << "C NNZ: " << C->getNNZ() << std::endl;
 
   mNumTriangles = C->getNNZ() / 3;
   ///////////////////////////////////////////////////////////////////////

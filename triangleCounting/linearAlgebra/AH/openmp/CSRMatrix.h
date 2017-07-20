@@ -76,7 +76,6 @@ class CSRMat
   std::vector<int> nnzInRow;                             // nnz in each row
   std::vector<std::vector<int> > cols;           //columns of nonzeros
   std::vector<std::vector<int> > vals; //values of nonzeros
-  std::vector<std::vector<int> > vals2; //values of nonzeros
 
   int mBlockSize;
 
@@ -85,7 +84,7 @@ class CSRMat
   // default constructor -- builds empty matrix
   //////////////////////////////////////////////////////////////////////////
   CSRMat() 
-    :type(UNDEFINED),m(0),n(0),nnz(0),nnzInRow(),cols(),vals(),vals2(),mBlockSize(1)
+    :type(UNDEFINED),m(0),n(0),nnz(0),nnzInRow(),cols(),vals(),mBlockSize(1)
   {
   };
   //////////////////////////////////////////////////////////////////////////
@@ -94,7 +93,7 @@ class CSRMat
   // Constructor that accepts matrix type as an argument
   //////////////////////////////////////////////////////////////////////////
   CSRMat(matrixtype _type) 
-    :type(_type),m(0),n(0),nnz(0),nnzInRow(),cols(),vals(),vals2(),mBlockSize(1)
+    :type(_type),m(0),n(0),nnz(0),nnzInRow(),cols(),vals(),mBlockSize(1)
   {
   };
   //////////////////////////////////////////////////////////////////////////
@@ -102,15 +101,11 @@ class CSRMat
   //////////////////////////////////////////////////////////////////////////
   // constructor -- allocates memory for CSR sparse matrix
   //////////////////////////////////////////////////////////////////////////
-  CSRMat(int _m, int _n, int blocksize=1,bool allocateVals2=false)
+  CSRMat(int _m, int _n, int blocksize=1)
     :type(UNDEFINED),m(_m),n(_n),
      nnzInRow(m),cols(m),
      vals(m),mBlockSize(blocksize)
   {
-    if(allocateVals2==true)
-    {
-      vals2.resize(m);
-    }
   };
   //////////////////////////////////////////////////////////////////////////
 
@@ -131,12 +126,6 @@ class CSRMat
   // print -- prints matrix to stdio
   //////////////////////////////////////////////////////////////////
   void print() const;
-  //////////////////////////////////////////////////////////////////
-
-  //////////////////////////////////////////////////////////////////
-  // Sums matrix elements
-  //////////////////////////////////////////////////////////////////
-  std::list<int> getSumElements() const;
   //////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////

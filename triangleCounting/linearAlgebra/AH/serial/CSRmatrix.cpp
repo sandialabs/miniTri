@@ -54,7 +54,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <list>
 #include <map>
 #include <set>
 #include <cassert>
@@ -64,10 +63,7 @@
 #include "mmUtil.h"
 #include "binFileReader.h"
 
-int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd);
-
-unsigned int choose2(unsigned int k);
-
+int addNZ(std::map<int,int> &nzMap,int col, int elemToAdd);
 
 //////////////////////////////////////////////////////////////////////////////
 // print function -- outputs matrix to file
@@ -81,44 +77,12 @@ void CSRMat::print() const
     {
       for(int nzIdx=0; nzIdx<nnzInRow[rownum]; nzIdx++)
 	{
-	  std::cout << rownum << " " << cols[rownum][nzIdx] << " { ";
-
-	  std::cout << vals[rownum][nzIdx] << std::endl;
-	  if(vals2.size()!=0)
-	    {
-	      std::cout << ", " << vals2[rownum][nzIdx];
-	    }
-	  std::cout << "}" << std::endl;
+	  std::cout << rownum << " " << cols[rownum][nzIdx] << " "
+                    << vals[rownum][nzIdx] << std::endl;
 	}
     }
 }
 //////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////
-// Sums matrix elements
-////////////////////////////////////////////////////////////////////////////////
-std::list<int> CSRMat::getSumElements() const
-{
-  std::list<int> matList;
-
-  for(int rownum=0; rownum<m; rownum++)
-    {
-      int nrows = nnzInRow[rownum];
-      for(int nzIdx=0; nzIdx<nrows; nzIdx++)
-	{
-	  matList.push_back(rownum);
-
-	  matList.push_back(vals[rownum][nzIdx]);
-
-	  // perhaps should add check for this
-	  matList.push_back(vals2[rownum][nzIdx]);
-
-	}
-    }
-
-  return matList;
-}
-////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
 // matmat -- level 3 basic linear algebra subroutine  
@@ -138,7 +102,6 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
     nnzInRow.resize(m);
     cols.resize(m);
     vals.resize(m);
-    vals2.resize(m);
   }
   //////////////////////////////////////////////////////////
 
@@ -152,7 +115,7 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
   for (int rownum=0; rownum<m; rownum++)
   {
     nnzInRow[rownum]=0;
-    std::map<int,std::list<int> > newNZs;
+    std::map<int,int> newNZs;
 
     int nnzInRowA = A.getNNZInRow(rownum);
 
@@ -166,20 +129,21 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
       {
         int colB=B.getCol(colA, nzindxB);
 
-        nnzInRow[rownum] += addNZ(newNZs,colB, colA);
+        // Should actually do multiply, but just using 1 works
+        nnzInRow[rownum] += addNZ(newNZs,colB, 1);
       }
     }
 
     /////////////////////////////////////////////////
     // Strip out any nonzeros that have only one element
-    //   This is an optimization for Triangle Enumeration
-    //   Algorithm #2                                
+    //   This is an optimization for Triangle Counting
+    //   Algorithm A*H                                
     /////////////////////////////////////////////////
-    std::map<int,std::list<int> >::iterator iter;
+    std::map<int,int>::iterator iter;
 
-    for (iter=newNZs.begin(); iter!=newNZs.end(); )
+    for (iter=newNZs.begin(); iter!=newNZs.end();)
     {
-      if((*iter).second.size()==1)
+      if((*iter).second==1)
       {
         newNZs.erase(iter++); // Remove nonzero
         nnzInRow[rownum]--;   // One less nonzero in row
@@ -201,24 +165,18 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
       /////////////////////////////////////////
       cols[rownum].resize(nnzInRow[rownum]);
       vals[rownum].resize(nnzInRow[rownum]);
-      vals2[rownum].resize(nnzInRow[rownum]);
 
       /////////////////////////////////////////
       //Copy new data into row
       /////////////////////////////////////////
-      std::map<int,std::list<int> >::iterator iter;
+      std::map<int,int>::iterator iter;
       int nzcnt=0;
 
       // Iterate through list
       for (iter=newNZs.begin(); iter!=newNZs.end(); iter++)
       {
 	  cols[rownum][nzcnt]= (*iter).first;
-
-	  std::list<int>::const_iterator lIter=(*iter).second.begin();
-	  vals[rownum][nzcnt] = *lIter;
-	  lIter++;
-	  vals2[rownum][nzcnt]= *lIter;
-
+	  vals[rownum][nzcnt]= (*iter).second;
 	  nzcnt++;
       }
       /////////////////////////////////////////
@@ -569,24 +527,22 @@ void CSRMat::createIncidenceMatrix(const CSRMat &matSrc, std::map<int,std::map<i
 //////////////////////////////////////////////////////////////////////////////
 // addNZ -- For a given row, add a column for a nonzero into a sorted list
 //////////////////////////////////////////////////////////////////////////////
-int addNZ(std::map<int,std::list<int> > &nzMap,int col, int elemToAdd)
+int addNZ(std::map<int,int> &nzMap,int col, int elemToAdd)
 {
-  std::map<int,std::list<int> >::iterator it;
+  std::map<int,int>::iterator it;
 
   it = nzMap.find(col);
 
   //////////////////////////////////////
-  //If columns match, no additional nz, add element to end of list
+  //If columns match, no additional nz, add element to nz
   //////////////////////////////////////      
   if(it != nzMap.end())
   {
-    (*it).second.push_back(elemToAdd);
+    (*it).second += elemToAdd;
     return 0;
   }
 
-  std::list<int> newList;
-  newList.push_back(elemToAdd);
-  nzMap.insert(std::pair<int,std::list<int> >(col, newList));
+  nzMap.insert(std::pair<int,int>(col, elemToAdd));
   return 1;
 }
 //////////////////////////////////////////////////////////////////////////////
