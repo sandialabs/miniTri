@@ -49,4 +49,4 @@ triCount	:	lib CSRmatrix.hpp Graph.hpp
 	$(CCC) $(INCDIRS) $(LIBPATH) $(CCFLAGS) -o triCount.exe triCount.cpp -lSPLA 
 
 clean	:
-	rm -f *.o *~ libSPLA.a *.out miniTri.exe
+	rm -f *.o *~ libSPLA.a *.out triCount.exe
