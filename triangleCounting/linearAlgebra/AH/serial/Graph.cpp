@@ -101,6 +101,13 @@ void Graph::countTriangles()
   std::cout << "--------------------" << std::endl;
   ///////////////////////////////////////////////////////////////////////
 
+  ///////////////////////////////////////////////////////////////////////
+  // Create lower triangle matrix
+  ///////////////////////////////////////////////////////////////////////
+  // Should eventually move this to constructor, build incidence from this
+  CSRMat L(LOWERTRI);
+  L.createTriMatrix(mMatrix, LOWERTRI);
+  ///////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////
   // C = A*B
@@ -112,7 +119,7 @@ void Graph::countTriangles()
   std::cout << "C = A*B: " << std::endl;
 
   gettimeofday(&t1, NULL);
-  C->matmat(mMatrix,B);
+  C->matmat(L,B);
   gettimeofday(&t2, NULL);
 
   //C.print();
@@ -123,7 +130,7 @@ void Graph::countTriangles()
   std::cout << "--------------------" << std::endl;
 
   std::cout << "C NNZ: " << C->getNNZ() << std::endl;
-  mNumTriangles = C->getNNZ() / 3;
+  mNumTriangles = C->getNNZ();
   ///////////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////////
