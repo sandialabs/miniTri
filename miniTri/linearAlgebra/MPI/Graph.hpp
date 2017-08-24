@@ -59,7 +59,7 @@
 #include <cmath>
 #include <memory>
 
-#include "CSRmatrix.hpp"
+#include "CSRMatrix.hpp"
 #include "Vector.hpp"
 
 //////////////////////////////////////////////////////////////////////////////

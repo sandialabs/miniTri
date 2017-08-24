@@ -234,7 +234,9 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
     {
       if((*iter).second.size()==1)
       {
-        newNZs.erase(iter++); // Remove nonzero
+        // newNZs.erase(iter++);   // Remove nonzero (C++98 Compliant)
+	iter = newNZs.erase(iter); // Remove nonzero (C++11 Required)
+
 	nnzInRow[rownum]--;   // One less nonzero in row
       }
       else

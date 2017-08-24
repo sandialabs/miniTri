@@ -11,7 +11,7 @@
 UTILDIRS = ../../utils/
 INCDIRS = -I. -I$(UTILDIRS)
 CCC = g++ 
-CCFLAGS = -O3 -Wall -DNDEBUG -fopenmp -std=c++11 $(BOOSTCCFLAGS)
+CCFLAGS = -O3 -Wall -DNDEBUG -fopenmp -std=c++11 
 LIBPATH = -L. 
 
 

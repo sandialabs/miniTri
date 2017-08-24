@@ -401,7 +401,8 @@ int matmat_ComputeRowBlock(const CSRMat &A, const CSRMat &B, blockDS blockInfo, 
     {
       if((*iter).second.size()==1)
       {
-        newNZs.erase(iter++); // Remove nonzero
+        // newNZs.erase(iter++);   // Remove nonzero (C++98 Compliant)
+	iter = newNZs.erase(iter); // Remove nonzero (C++11 Compliant)
         nnzInRow[rownum]--;   // One less nonzero in row
       }
       else

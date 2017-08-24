@@ -12,7 +12,7 @@
 UTILDIR = ../../utils/
 INCDIRS = -I. -I$(UTILDIR)
 CCC = g++ 
-CCFLAGS = -O3 -Wall -DNDEBUG
+CCFLAGS = -O3 -Wall -DNDEBUG -std=c++11
 LIBPATH = -L. 
 
 #--------------------------------------------------

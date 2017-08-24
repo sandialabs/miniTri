@@ -60,7 +60,7 @@
 #include <cassert>
 #include <cstdlib>
 
-#include "CSRmatrix.hpp"
+#include "CSRMatrix.hpp"
 #include "Vector.hpp"
 #include "mmUtil.h"
 #include "binFileReader.h"
@@ -378,7 +378,8 @@ void CSRMat::matmat(const CSRMat &A, const CSRMat &B)
       {
         if((*iter).second.size()==1)
         {
-          CNZs[submatNum][rownum].erase(iter++); // Remove nonzero
+          //CNZs[submatNum][rownum].erase(iter++);      // Remove nonzero (C++98 Compliant)
+	  iter = CNZs[submatNum][rownum].erase(iter); // Remove nonzero (C++11 Required)
         }
         else
         {
