@@ -76,8 +76,8 @@ extern "C"{
 //////////////////////////////////////////////////////////////////////////////
 double Graph::triangleCount()
 {
-  struct timeval t1, t2, t3, t4;
-  double eTime1, eTime2, eTime;
+  //  struct timeval t1, t2, t3, t4;
+  double eTime1;
 
   //size_t numTriangles;
   int64_t numTriangles=0;
@@ -97,22 +97,15 @@ double Graph::triangleCount()
   //////////////////////////////////////////////////////////////////
   // typedefs
   //////////////////////////////////////////////////////////////////
-  typedef typename crsMat_t::StaticCrsGraphType::row_map_type::non_const_type lno_view_t;
+  //  typedef typename crsMat_t::StaticCrsGraphType::row_map_type::non_const_type lno_view_t;
   typedef typename crsMat_t::StaticCrsGraphType::entries_type::non_const_type lno_nnz_view_t;
-  typedef myExecSpace TempMemSpace;
-  typedef myExecSpace PersistentMemSpace;
-
-  // typedef KokkosKernels::Experimental::KokkosKernelsHandle
-  //   <lno_view_t,lno_nnz_view_t, lno_nnz_view_t, myExecSpace, TempMemSpace,PersistentMemSpace > KernelHandle;
   //////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////
-  // Creating lower triangular matrix.
+  // Determine order of vertices/rows when forming L
   //////////////////////////////////////////////////////////////////
   const ordinal_t m = mAdjMatrixA.numRows();
   Kokkos::Impl::Timer timer1;
-
-  crsMat_t adjMatrixL;
 
   std::vector<ordinal_t> newIndices;
 
@@ -123,52 +116,45 @@ double Graph::triangleCount()
   KokkosKernels::Impl::
     kk_sort_by_row_size <size_type, ordinal_t,myExecSpace>(m,mAdjMatrixA.graph.row_map.data(),
   							   newIndices.data());
-
-  for(unsigned int i=0; i<newIndices.size(); i++)
-  {
-    std::cout << "newIndices: " << newIndices[i] << std::endl;
-  }
-
-
-  // Create "lower triangular" portion of matrix
-  adjMatrixL = KokkosKernels::Impl::kk_get_lower_crs_matrix(mAdjMatrixA,newIndices.data());
-
-  myExecSpace::fence();
-  eTime1 = timer1.seconds();
   //////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////
-  // Convert KK "lower triangle" matrix to graphBLAS format
+  // Create "lower triangle" matrix in graphBLAS format
   //////////////////////////////////////////////////////////////////
-  size_type nnz = adjMatrixL.nnz();
+  size_type nnz = mAdjMatrixA.nnz();
+  size_type nnzL = nnz/2;
 
   /////////////////////////////////////////////////////////////
   // Create tuple arrays i,j,v
   /////////////////////////////////////////////////////////////
-  GrB_Index *i = (GrB_Index*) malloc (nnz * sizeof (int64_t));
-  GrB_Index *j = (GrB_Index*) malloc (nnz * sizeof (int64_t));
+  GrB_Index *i = (GrB_Index*) malloc (nnzL * sizeof (int64_t));
+  GrB_Index *j = (GrB_Index*) malloc (nnzL * sizeof (int64_t));
 
   // Should this be int or something else?
-  uint32_t *v = (uint32_t *) malloc (nnz * sizeof (uint32_t));
+  uint32_t *v = (uint32_t *) malloc (nnzL * sizeof (uint32_t));
   /////////////////////////////////////////////////////////////
 
   /////////////////////////////////////////////////////////////
   // Copy data from KK structure to Graph BLAS arrays
   /////////////////////////////////////////////////////////////
-  graph_t & graphL = adjMatrixL.graph; 
+  graph_t & graphA = mAdjMatrixA.graph; 
 
-   auto rowmapL = graphL.row_map;
+   auto rowmapA = graphA.row_map;
   //lno_view_t rowmapL = graphL.row_map;
-  lno_nnz_view_t colIndsL = graphL.entries;
-  auto valuesL = adjMatrixL.values;
+  lno_nnz_view_t colIndsA = graphA.entries;
 
+  size_type nzIndx=0;
   for(ordinal_t rownum=0; rownum<m; rownum++)
   {
-    for(size_type indx=rowmapL[rownum]; indx<rowmapL[rownum+1]; indx++)
+    for(size_type indx=rowmapA[rownum]; indx<rowmapA[rownum+1]; indx++)
     {
-      i[indx] = rownum;
-      j[indx] = colIndsL[indx];
-      v[indx] = 1;
+      if(newIndices[colIndsA[indx]] < newIndices[rownum])
+      {
+        i[nzIndx] = rownum;
+        j[nzIndx] = colIndsA[indx];
+        v[nzIndx] = 1;
+        nzIndx++;
+      }
     }
   }
   /////////////////////////////////////////////////////////////
@@ -181,7 +167,7 @@ double Graph::triangleCount()
   GrB_Matrix_new (&gbL, GrB_UINT32, m, m);
   //For some reason this macro didn't seem to work
   //GrB_Matrix_build (C, i, j, v, nnz, GrB_PLUS_UINT32);
-  GrB_Matrix_build_UINT32 (gbL, i, j, v, nnz, GrB_PLUS_UINT32);
+  GrB_Matrix_build_UINT32 (gbL, i, j, v, nnzL, GrB_PLUS_UINT32);
   /////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////
@@ -208,7 +194,7 @@ double Graph::triangleCount()
   ///////////////////////////////////////////////////////////////////////
 
   myExecSpace::fence();
-  eTime2 = timer2.seconds();
+  eTime1 = timer1.seconds();
 
 
   std::cout << "************************************************************"
@@ -227,9 +213,7 @@ double Graph::triangleCount()
   std::cout << "|E| = " << numEdges << std::endl;
   std::cout << "|T| = " << numTriangles << std::endl;
 
-  std::cout << "Time1: " << eTime1 << std::endl;
-  std::cout << "Time2: " << eTime2 << std::endl;
-  std::cout << "Time to count triangles: " << eTime1+eTime2 << std::endl;
+  std::cout << "Time to count triangles: " << eTime1 << std::endl;
   //////////////////////////////////////////////////////////////////
 
   //////////////////////////////////////////////////////////////////
@@ -245,7 +229,7 @@ double Graph::triangleCount()
   GrB_finalize();
 
 
-  return eTime;
+  return eTime1;
 }
 //////////////////////////////////////////////////////////////////////////////
 
