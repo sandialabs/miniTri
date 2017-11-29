@@ -66,8 +66,6 @@
 //////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
-  struct timeval t1, t2;
- 
   if(argc!=3)
   {
     std::cerr << "Usage: miniTri.exe matrixFile numThreads" << std::endl;

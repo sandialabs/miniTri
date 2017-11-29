@@ -87,7 +87,7 @@ class Graph
   Graph(std::string fname1) 
     :mAdjMatrixA()
   {
-    struct timeval t1, t2, t3;
+    struct timeval t1, t2;
 
     gettimeofday(&t1, NULL);
 

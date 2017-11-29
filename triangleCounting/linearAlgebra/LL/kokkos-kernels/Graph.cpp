@@ -69,7 +69,6 @@
 //////////////////////////////////////////////////////////////////////////////
 double Graph::triangleCount()
 {
-  struct timeval t1, t2, t3, t4;
   double eTime;
 
   size_t numTriangles;
