@@ -183,9 +183,9 @@ double Graph::triangleCount()
   // Q kokkos Lambda -- run on each entry of resulting matrix
   //////////////////////////////////////////////////////////////////
   //  graph_t & graphL = adjMatrixL.graph;
-  graph_t & graphL = mAdjMatrixA.graph;
+  graph_t & graphA = mAdjMatrixA.graph;
 
-  KokkosGraph::Experimental::triangle_generic(&kh, m, graphL.row_map, graphL.entries,
+  KokkosGraph::Experimental::triangle_generic(&kh, m, graphA.row_map, graphA.entries,
       KOKKOS_LAMBDA(const ordinal_t& row, const ordinal_t &col_set_index, const ordinal_t &col_set,  const ordinal_t &thread_id) 
       {
 	matC_row(row) += KokkosKernels::Impl::pop_count(col_set);
